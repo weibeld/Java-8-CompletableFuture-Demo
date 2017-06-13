@@ -2,6 +2,7 @@ import java.util.concurrent.Future;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BestPriceFinder {
 
@@ -20,6 +21,13 @@ public class BestPriceFinder {
 
   public List<String> findAllPrices(String product) {
     return mShops.stream()
+      .map(s -> String.format("%s: %.2f", s.getName(), s.getPrice(product)))
+      .collect(Collectors.toList());
+  }
+
+  public List<String> findAllPricesParallel(String product) {
+    // Note that this stream is not guaranteed to be parallel
+    return mShops.parallelStream()
       .map(s -> String.format("%s: %.2f", s.getName(), s.getPrice(product)))
       .collect(Collectors.toList());
   }

@@ -51,6 +51,15 @@ public class ShopTest {
     prices.stream().forEach(this::say);
   }
 
+  @Test
+  public void runFindAllPricesParallel() {
+    say("> Calling findAllPricesParallel");
+    long startTime = getTime();
+    List<String> prices = mFinder.findAllPrices(mProduct);
+    say("< findAllPricesParallel returns after " + (getTime() - startTime) + " milliseconds");
+    prices.stream().forEach(this::say);
+  }
+
   private void say(String str) {
     System.out.println(str);
   }
