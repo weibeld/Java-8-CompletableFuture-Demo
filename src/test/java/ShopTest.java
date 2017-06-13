@@ -3,21 +3,32 @@ import org.junit.Ignore;
 import java.util.concurrent.Future;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class ShopTest {
 
-  private Shop shop = new Shop("BestShop");
-  //private final String PRODUCT = "BestProduct";
-  private final String PRODUCT = "NA";
+  private BestPriceFinder mFinder = new BestPriceFinder();
+  private String mProduct = "BestProduct";  // "NA"
+  private String mShop = "BestShop";
 
   @Test
-  public void testGetPriceAsync() {
-    say("> Calling getPriceAsync");
+  public void runFindPrice() {
+    say("> Calling findPrice");
     long startTime = getTime();
-    Future<Double> futurePrice = shop.getPriceAsync(PRODUCT);
-    say("< getPriceAsync returns a Future after " + (getTime() - startTime) + " milliseconds");
+    double price = mFinder.findPrice(mShop, mProduct);
+    say("< findPrice returns after " + (getTime() - startTime) + " milliseconds");
+    say("I have been blocked until now :(");
+    say("The price is " + round(price));
+  }
+
+  @Test
+  public void runFindPriceAsync() {
+    say("> Calling findPriceAsync");
+    long startTime = getTime();
+    Future<Double> futurePrice = mFinder.findPriceAsync(mShop, mProduct);
+    say("< findPriceAsync returns a Future after " + (getTime() - startTime) + " milliseconds");
 
     say("I can now dow anything I want :)");
     doSomethingElse();
@@ -30,17 +41,6 @@ public class ShopTest {
     }
     say("The Future is ready after " + (getTime() - startTime) + " milliseconds, price is " + round(price));
   }
-
-  @Test
-  public void testGetPriceSync() {
-    say("> Calling getPrice");
-    long startTime = getTime();
-    double price = shop.getPrice(PRODUCT);
-    say("< getPrice returns after " + (getTime() - startTime) + " milliseconds");
-    say("I have been blocked until now :(");
-    say("The price is " + round(price));
-  }
-
 
   private void say(String str) {
     System.out.println(str);
