@@ -1,16 +1,28 @@
-import java.util.concurrent.Future;
-import java.util.concurrent.CompletableFuture;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BestPriceFinder {
 
-  private List<Shop> mShops = Arrays.asList(new Shop("BestShop"),
-                                            new Shop("WeRipYouOff"),
-                                            new Shop("Abriss GmbH"),
-                                            new Shop("IKEA"));
+  private final List<Shop> mShops = Arrays.asList(new Shop("BestShop"),
+                                                  new Shop("WeRipYouOff"),
+                                                  new Shop("Abriss GmbH"),
+                                                  new Shop("IKEA"));
+
+  // One thread for each shop (results in total exec time = exec time of 1 shop)
+  private final Executor mExecutor = Executors.newFixedThreadPool(
+    Math.min(mShops.size(), 100),
+    runnable -> {
+      Thread t = new Thread(runnable);
+      t.setDaemon(true);
+      return t;
+    });
 
   public double findPrice(String shop, String product) {
     return (new Shop(shop)).getPrice(product);
@@ -36,7 +48,8 @@ public class BestPriceFinder {
   public List<String> findAllPricesAsync(String product) {
     List<CompletableFuture<String>> futures = mShops.stream()
       .map(s -> CompletableFuture.supplyAsync(
-        () -> String.format("%s: %.2f", s.getName(), s.getPrice(product))))
+        () -> String.format("%s: %.2f", s.getName(), s.getPrice(product)),
+      mExecutor))
       .collect(Collectors.toList());
 
     // Can do something else here

@@ -13,7 +13,7 @@ public class ShopTest {
   private String mProduct = "BestProduct";  // "NA"
   private String mShop = "BestShop";
 
-  @Test
+  @Test @Ignore
   public void runFindPrice() {
     say("> Calling findPrice");
     long startTime = getTime();
@@ -23,7 +23,7 @@ public class ShopTest {
     say("The price is " + round(price));
   }
 
-  @Test
+  @Test @Ignore
   public void runFindPriceAsync() {
     say("> Calling findPriceAsync");
     long startTime = getTime();
@@ -42,7 +42,7 @@ public class ShopTest {
     say("The Future is ready after " + (getTime() - startTime) + " milliseconds, price is " + round(price));
   }
 
-  @Test
+  @Test @Ignore
   public void runFindAllPrices() {
     say("> Calling findAllPrices");
     long startTime = getTime();
@@ -51,7 +51,7 @@ public class ShopTest {
     prices.stream().forEach(this::say);
   }
 
-  @Test
+  @Test @Ignore
   public void runFindAllPricesParallel() {
     say("> Calling findAllPricesParallel");
     long startTime = getTime();
