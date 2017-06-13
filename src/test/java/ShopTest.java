@@ -42,6 +42,15 @@ public class ShopTest {
     say("The Future is ready after " + (getTime() - startTime) + " milliseconds, price is " + round(price));
   }
 
+  @Test
+  public void runFindAllPrices() {
+    say("> Calling findAllPrices");
+    long startTime = getTime();
+    List<String> prices = mFinder.findAllPrices(mProduct);
+    say("< findAllPrices returns after " + (getTime() - startTime) + " milliseconds");
+    prices.stream().forEach(this::say);
+  }
+
   private void say(String str) {
     System.out.println(str);
   }

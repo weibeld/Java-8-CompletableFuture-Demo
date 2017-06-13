@@ -18,4 +18,10 @@ public class BestPriceFinder {
     return (new Shop(shop)).getPriceAsync(product);
   }
 
+  public List<String> findAllPrices(String product) {
+    return mShops.stream()
+      .map(s -> String.format("%s: %.2f", s.getName(), s.getPrice(product)))
+      .collect(Collectors.toList());
+  }
+
 }
