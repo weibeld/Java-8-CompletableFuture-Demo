@@ -60,6 +60,16 @@ public class ShopTest {
     prices.stream().forEach(this::say);
   }
 
+  @Test
+  public void runFindAllPricesAsync() {
+    say("> Calling findAllPricesAsync");
+    long startTime = getTime();
+    List<String> prices = mFinder.findAllPricesAsync(mProduct);
+    say("< findAllPricesAsync returns after " + (getTime() - startTime) + " milliseconds");
+    prices.stream().forEach(this::say);
+    
+  }
+
   private void say(String str) {
     System.out.println(str);
   }

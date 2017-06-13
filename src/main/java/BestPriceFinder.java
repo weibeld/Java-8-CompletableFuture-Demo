@@ -1,4 +1,5 @@
 import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +30,27 @@ public class BestPriceFinder {
     // Note that this stream is not guaranteed to be parallel
     return mShops.parallelStream()
       .map(s -> String.format("%s: %.2f", s.getName(), s.getPrice(product)))
+      .collect(Collectors.toList());
+  }
+
+  public List<String> findAllPricesAsync(String product) {
+    List<CompletableFuture<String>> futures = mShops.stream()
+      .map(s -> CompletableFuture.supplyAsync(
+        () -> String.format("%s: %.2f", s.getName(), s.getPrice(product))))
+      .collect(Collectors.toList());
+
+    // Can do something else here
+
+    return futures.stream()  // blocking...
+      .map(future -> {
+        String result;
+        try {
+          result = future.get();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+        return result;
+      })
       .collect(Collectors.toList());
   }
 
