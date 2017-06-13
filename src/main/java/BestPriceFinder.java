@@ -41,16 +41,8 @@ public class BestPriceFinder {
 
     // Can do something else here
 
-    return futures.stream()  // blocking...
-      .map(future -> {
-        String result;
-        try {
-          result = future.get();
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        }
-        return result;
-      })
+    return futures.stream()
+      .map(CompletableFuture::join)  // blocking...
       .collect(Collectors.toList());
   }
 
