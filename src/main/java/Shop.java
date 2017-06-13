@@ -11,15 +11,7 @@ public class Shop {
   }
 
   public Future<Double> getPriceAsync(String product) {
-    CompletableFuture<Double> future = new CompletableFuture<>();
-    new Thread(() -> {
-      try {
-        future.complete(calculatePrice(product));
-      } catch (Exception e) {
-        future.completeExceptionally(e);
-      }
-    }).start();
-    return future;
+    return CompletableFuture.supplyAsync(() -> calculatePrice(product));
   }
 
   public double getPrice(String product) {
