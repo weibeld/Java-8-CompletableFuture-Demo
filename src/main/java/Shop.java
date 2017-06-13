@@ -11,9 +11,15 @@ public class Shop {
   }
 
   public Future<Double> getPriceAsync(String product) {
-    CompletableFuture<Double> price = new CompletableFuture<>();
-    new Thread( () -> price.complete(calculatePrice(product)) ).start();
-    return price;
+    CompletableFuture<Double> future = new CompletableFuture<>();
+    new Thread(() -> {
+      try {
+        future.complete(calculatePrice(product));
+      } catch (Exception e) {
+        future.completeExceptionally(e);
+      }
+    }).start();
+    return future;
   }
 
   public double getPrice(String product) {
@@ -22,6 +28,8 @@ public class Shop {
 
   private double calculatePrice(String product) {
     delay();
+    if (product.equals("NA"))
+      throw new IllegalArgumentException("Product not available");
     // Generate a price between 0 and 199.99 based on the product name
     int hash = product.hashCode();
     int dollars = hash % 200;

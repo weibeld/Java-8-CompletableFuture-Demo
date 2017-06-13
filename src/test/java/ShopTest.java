@@ -2,13 +2,15 @@ import org.junit.Test;
 import org.junit.Ignore;
 import java.util.concurrent.Future;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
 public class ShopTest {
 
   private Shop shop = new Shop("BestShop");
-  private final String PRODUCT = "BestProduct";
+  //private final String PRODUCT = "BestProduct";
+  private final String PRODUCT = "NA";
 
   @Test
   public void testGetPriceAsync() {
@@ -22,7 +24,7 @@ public class ShopTest {
 
     double price;
     try {
-      price = futurePrice.get();
+      price = futurePrice.get(10, TimeUnit.SECONDS);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
