@@ -1,3 +1,5 @@
+package org.weibeld.bestprice;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;

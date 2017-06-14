@@ -1,3 +1,5 @@
+package org.weibeld.bestprice;
+
 import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
 
