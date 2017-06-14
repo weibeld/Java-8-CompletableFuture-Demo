@@ -24,32 +24,30 @@ public class BestPriceFinder {
       return t;
     });
 
-  public double findPrice(String shop, String product) {
+  public String findPrice(String shop, String product) {
     return (new Shop(shop)).getPrice(product);
   }
 
-  public Future<Double> findPriceAsync(String shop, String product) {
+  public Future<String> findPriceAsync(String shop, String product) {
     return (new Shop(shop)).getPriceAsync(product);
   }
 
   public List<String> findAllPrices(String product) {
     return mShops.stream()
-      .map(s -> String.format("%s: %.2f", s.getName(), s.getPrice(product)))
+      .map(shop -> shop.getPrice(product))
       .collect(Collectors.toList());
   }
 
   public List<String> findAllPricesParallel(String product) {
     // Note that this stream is not guaranteed to be parallel
     return mShops.parallelStream()
-      .map(s -> String.format("%s: %.2f", s.getName(), s.getPrice(product)))
+      .map(shop -> shop.getPrice(product))
       .collect(Collectors.toList());
   }
 
   public List<String> findAllPricesAsync(String product) {
     List<CompletableFuture<String>> futures = mShops.stream()
-      .map(s -> CompletableFuture.supplyAsync(
-        () -> String.format("%s: %.2f", s.getName(), s.getPrice(product)),
-      mExecutor))
+      .map(s -> CompletableFuture.supplyAsync(() -> s.getPrice(product), mExecutor))
       .collect(Collectors.toList());
 
     // Can do something else here

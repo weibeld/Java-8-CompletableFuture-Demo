@@ -13,36 +13,36 @@ public class ShopTest {
   private String mProduct = "BestProduct";  // "NA"
   private String mShop = "BestShop";
 
-  @Test @Ignore
+  @Test
   public void runFindPrice() {
     say("> Calling findPrice");
     long startTime = getTime();
-    double price = mFinder.findPrice(mShop, mProduct);
+    String price = mFinder.findPrice(mShop, mProduct);
     say("< findPrice returns after " + (getTime() - startTime) + " milliseconds");
     say("I have been blocked until now :(");
-    say("The price is " + round(price));
+    say("The price is " + price);
   }
 
-  @Test @Ignore
+  @Test
   public void runFindPriceAsync() {
     say("> Calling findPriceAsync");
     long startTime = getTime();
-    Future<Double> futurePrice = mFinder.findPriceAsync(mShop, mProduct);
+    Future<String> futurePrice = mFinder.findPriceAsync(mShop, mProduct);
     say("< findPriceAsync returns a Future after " + (getTime() - startTime) + " milliseconds");
 
     say("I can now dow anything I want :)");
     doSomethingElse();
 
-    double price;
+    String price;
     try {
       price = futurePrice.get(10, TimeUnit.SECONDS);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    say("The Future is ready after " + (getTime() - startTime) + " milliseconds, price is " + round(price));
+    say("The Future is ready after " + (getTime() - startTime) + " milliseconds, price is " + price);
   }
 
-  @Test @Ignore
+  @Test
   public void runFindAllPrices() {
     say("> Calling findAllPrices");
     long startTime = getTime();
@@ -51,7 +51,7 @@ public class ShopTest {
     prices.stream().forEach(this::say);
   }
 
-  @Test @Ignore
+  @Test
   public void runFindAllPricesParallel() {
     say("> Calling findAllPricesParallel");
     long startTime = getTime();
@@ -93,8 +93,4 @@ public class ShopTest {
     }
   }
 
-  private double round(double number) {
-    // Round to 2 decimal places
-    return Math.round((number * 100)) / 100.0;
-  }
 }
