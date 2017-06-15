@@ -11,18 +11,10 @@ public class TestHelpers {
   }
 
   public static void doSomethingElse() {
-    delay();
+    Util.delay(500L);
     say("doodelidum..");
-    delay();
+    Util.delay(500L);
     say("doodelidum....");
-  }
-
-  public static void delay() {
-    try {
-      Thread.sleep(1000L);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
 }
