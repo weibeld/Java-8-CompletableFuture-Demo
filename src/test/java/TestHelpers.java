@@ -11,10 +11,10 @@ public class TestHelpers {
   }
 
   public static void doSomethingElse() {
-    Util.delay(500L);
+    //Util.delay(500L);
     say("doodelidum..");
-    Util.delay(500L);
-    say("doodelidum....");
+    //Util.delay(500L);
+    //say("doodelidum....");
   }
 
 }

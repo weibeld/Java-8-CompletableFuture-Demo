@@ -10,8 +10,6 @@ import java.util.concurrent.CompletableFuture;
  *   CompletableFuture<String> getPriceAsync (String product) */
 public class Shop {
 
-  private static final long DELAY = 2000L;
-
   private String mName; 
 
   public Shop(String name) {
@@ -25,7 +23,7 @@ public class Shop {
   public String getPrice(String product) {
     double price = determinePrice(product);
     DiscountService.Code discountCode = determineDiscountCode(product);
-    Util.delay(DELAY);
+    Util.randomDelay();
     return String.format("%s:%.2f:%s", mName, price, discountCode);
   }
 
