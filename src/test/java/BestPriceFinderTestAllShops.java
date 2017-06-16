@@ -3,6 +3,8 @@ package org.weibeld.bestprice;
 import org.junit.Test;
 import org.junit.Ignore;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
 import static org.weibeld.bestprice.TestHelpers.getTime;
@@ -35,9 +37,13 @@ public class BestPriceFinderTestAllShops {
   public void runFindAllPricesAsync() {
     say("> Calling findAllPricesAsync");
     long startTime = getTime();
-    List<String> prices = mFinder.findAllPricesAsync(mProduct);
+    Stream<CompletableFuture<String>> fut = mFinder.findAllPricesAsync(mProduct);
     say("< findAllPricesAsync returns after " + (getTime() - startTime) + " milliseconds");
-    prices.stream().forEach(TestHelpers::say);
+
+    CompletableFuture[] futArr = fut.map(f -> f.thenAccept(System.out::println))
+      .toArray(size -> new CompletableFuture[size]);
+    CompletableFuture.allOf(futArr).join();
+    say("All shops returned results after " + (getTime() - startTime) + " milliseconds");
   }
 
 }

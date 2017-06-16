@@ -37,8 +37,7 @@ public class BestPriceFinder {
     });
 
   public String findPrice(String shop, String product) {
-    return DiscountService.applyDiscount(Quote.parse(
-      (new Shop(shop)).getPrice(product)));
+    return DiscountService.applyDiscount(Quote.parse((new Shop(shop)).getPrice(product)));
   }
 
   public Future<String> findPriceAsync(String shop, String product) {
@@ -65,16 +64,11 @@ public class BestPriceFinder {
   }
 
   // This solution uses a synchronous API in an asynchronous (non-blocking) way
-  public List<String> findAllPricesAsync(String product) {
-    List<CompletableFuture<String>> futures = mShops.stream()
+  public Stream<CompletableFuture<String>> findAllPricesAsync(String product) {
+    return mShops.stream()
       .map(shop -> supplyAsync(() -> shop.getPrice(product), mExec))
       .map(f -> f.thenApply(Quote::parse))
-      .map(f -> f.thenCompose(q -> supplyAsync(() -> applyDiscount(q), mExec)))
-      .collect(Collectors.toList());
-
-    return futures.stream()
-      .map(CompletableFuture::join)  // blocking... blocking...
-      .collect(Collectors.toList());
+      .map(f -> f.thenCompose(q -> supplyAsync(() -> applyDiscount(q), mExec)));
   }
 
 }
