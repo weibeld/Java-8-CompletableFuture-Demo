@@ -23,7 +23,7 @@ public class BestPriceFinderTestSingleShop {
     String price = mFinder.findPrice(mShop, mProduct);
     say("< findPrice returns after " + (getTime() - startTime) + " milliseconds");
     say("I have been blocked until now :(");
-    say("The price is " + price);
+    say(price);
   }
 
   @Test
@@ -42,7 +42,8 @@ public class BestPriceFinderTestSingleShop {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    say("The Future is ready after " + (getTime() - startTime) + " milliseconds, price is " + price);
+    say("The Future is ready after " + (getTime() - startTime) + " milliseconds");
+    say(price);
   }
 
 }

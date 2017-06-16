@@ -10,6 +10,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static org.weibeld.bestprice.DiscountService.applyDiscount;
+
 /* Client
  * API:
  *   String         findPrice             (String shop, String product)
@@ -25,7 +28,7 @@ public class BestPriceFinder {
                                                   new Shop("IKEA"));
 
   // One thread for each shop (results in total exec time = exec time of 1 shop)
-  private final Executor mExecutor = Executors.newFixedThreadPool(
+  private final Executor mExec = Executors.newFixedThreadPool(
     Math.min(mShops.size(), 100),
     runnable -> {
       Thread t = new Thread(runnable);
@@ -34,12 +37,14 @@ public class BestPriceFinder {
     });
 
   public String findPrice(String shop, String product) {
-    String shopInfo = (new Shop(shop)).getPrice(product);
-    return DiscountService.applyDiscount(Quote.parse(shopInfo));
+    return DiscountService.applyDiscount(Quote.parse(
+      (new Shop(shop)).getPrice(product)));
   }
 
   public Future<String> findPriceAsync(String shop, String product) {
-    return (new Shop(shop)).getPriceAsync(product);
+    return (new Shop(shop)).getPriceAsync(product)
+      .thenApply(Quote::parse)
+      .thenCompose(DiscountService::applyDiscountAsync);
   }
 
   public List<String> findAllPrices(String product) {
@@ -61,23 +66,14 @@ public class BestPriceFinder {
 
   // This solution uses a synchronous API in an asynchronous (non-blocking) way
   public List<String> findAllPricesAsync(String product) {
-    List<CompletableFuture<String>> shopFutures= mShops.stream()
-      .map(s -> CompletableFuture.supplyAsync(() -> s.getPrice(product), mExecutor))
+    List<CompletableFuture<String>> futures = mShops.stream()
+      .map(shop -> supplyAsync(() -> shop.getPrice(product), mExec))
+      .map(f -> f.thenApply(Quote::parse))
+      .map(f -> f.thenCompose(q -> supplyAsync(() -> applyDiscount(q), mExec)))
       .collect(Collectors.toList());
 
-    // It's important to separate these two streams, otherwise the creation of
-    // each CompletableFuture will only start when the previous one completed.
-
-    List<CompletableFuture<String>> discountFutures = shopFutures.stream()
-      .map(CompletableFuture::join)  // blocking...
-      .map(Quote::parse)
-      .map(q -> CompletableFuture.supplyAsync(() -> DiscountService.applyDiscount(q), mExecutor))
-      .collect(Collectors.toList());
-
-    // Idem above
-
-    return discountFutures.stream()
-      .map(CompletableFuture::join)  // blocking...
+    return futures.stream()
+      .map(CompletableFuture::join)  // blocking... blocking...
       .collect(Collectors.toList());
   }
 

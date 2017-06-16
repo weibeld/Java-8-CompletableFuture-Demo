@@ -1,8 +1,11 @@
 package org.weibeld.bestprice;
 
+import java.util.concurrent.CompletableFuture;
+
 /* Server
  * API:
- *   static String applyDiscount(Quote quote) */
+ *   static String                    applyDiscount      (Quote quote)
+ *   static CompletableFuture<String> applyDiscountAsync (Quote quote) */
 public class DiscountService {
 
   private static final long DELAY = 2000L;
@@ -19,6 +22,10 @@ public class DiscountService {
     double discountedPrice = apply(quote.getPrice(), quote.getDiscountCode());
     Util.delay(DELAY);
     return String.format("%s: %.2f", quote.getShopName(), discountedPrice);
+  }
+
+  public static CompletableFuture<String> applyDiscountAsync(Quote quote) {
+    return CompletableFuture.supplyAsync(() -> applyDiscount(quote));
   }
 
   private static double apply(double price, Code code) {

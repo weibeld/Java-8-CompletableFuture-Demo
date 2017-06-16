@@ -6,8 +6,8 @@ import java.util.concurrent.CompletableFuture;
 
 /* Server
  * API:
- *   String         getPrice      (String product)
- *   Future<String> getPriceAsync (String product) */
+ *   String                    getPrice      (String product)
+ *   CompletableFuture<String> getPriceAsync (String product) */
 public class Shop {
 
   private static final long DELAY = 2000L;
@@ -18,7 +18,7 @@ public class Shop {
     mName = name;
   }
 
-  public Future<String> getPriceAsync(String product) {
+  public CompletableFuture<String> getPriceAsync(String product) {
     return CompletableFuture.supplyAsync(() -> getPrice(product));
   }
 
