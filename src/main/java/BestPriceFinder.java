@@ -7,9 +7,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
+import org.weibeld.bestprice.ExchangeService.Currency;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static org.weibeld.bestprice.DiscountService.applyDiscount;
 
 /* Client */
 public class BestPriceFinder {
@@ -28,22 +28,38 @@ public class BestPriceFinder {
       return t;
     });
 
-  public String findPrice(String shop, String product) {
-    return DiscountService.applyDiscount(Quote.parse((new Shop(shop)).getPrice(product)));
+  public ShopPrice findPrice(String shop, String product) {
+    String priceInfo = (new Shop(shop)).getPrice(product);
+    ShopPrice price = DiscountService.applyDiscount(Quote.parse(priceInfo));
+    price.convertCurrency(ExchangeService.getUsdEur(), Currency.EUR);
+    return price;
   }
 
-  public Future<String> findPriceAsync(String shop, String product) {
-    return (new Shop(shop)).getPriceAsync(product)
+  public Future<ShopPrice> findPriceAsync(String shop, String product) {
+    return supplyAsync(() -> (new Shop(shop)).getPrice(product))
       .thenApply(Quote::parse)
-      .thenCompose(DiscountService::applyDiscountAsync);
+      .thenCompose(q -> supplyAsync(() -> DiscountService.applyDiscount(q)))
+      .thenCombine(supplyAsync(() -> ExchangeService.getUsdEur()),
+        (price, rate) -> {
+          price.convertCurrency(rate, Currency.EUR);
+          return price;
+        });
   }
 
   // This solution uses a synchronous API in an asynchronous (non-blocking) way
-  public Stream<CompletableFuture<String>> findAllPricesAsync(String product) {
+  public Stream<CompletableFuture<ShopPrice>> findAllPricesAsync(String product) {
     return mShops.stream()
       .map(shop -> supplyAsync(() -> shop.getPrice(product), mExec))
       .map(f -> f.thenApply(Quote::parse))
-      .map(f -> f.thenCompose(q -> supplyAsync(() -> applyDiscount(q), mExec)));
+      .map(f -> f.thenCompose(
+        quote -> supplyAsync(() -> DiscountService.applyDiscount(quote), mExec)))
+      .map(f -> f.thenCombine(
+        supplyAsync(ExchangeService::getUsdEur, mExec),
+        (price, rate) -> {
+          price.convertCurrency(rate, Currency.EUR);
+          return price;
+        }
+      ));
   }
 
 }

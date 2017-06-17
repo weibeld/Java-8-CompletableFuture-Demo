@@ -2,7 +2,8 @@ package org.weibeld.bestprice;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
-
+import org.weibeld.bestprice.ExchangeService.Currency;
+import org.weibeld.bestprice.DiscountService.DiscountCode;
 
 /* Server
  * API:
@@ -22,9 +23,10 @@ public class Shop {
 
   public String getPrice(String product) {
     double price = determinePrice(product);
-    DiscountService.Code discountCode = determineDiscountCode(product);
+    DiscountCode discountCode = determineDiscountCode(product);
+    Currency currency = Currency.valueOf("USD");
     Util.randomDelay();
-    return String.format("%s:%.2f:%s", mName, price, discountCode);
+    return String.format("%s:%.2f:%s:%s", mName, price, discountCode, currency);
   }
 
   // Deterministically generate a price based on shop name and product name
@@ -39,8 +41,8 @@ public class Shop {
   }
 
   // Deterministically pick a discount code based on shop name and product name
-  private DiscountService.Code determineDiscountCode(String product) {
-    DiscountService.Code[] codes = DiscountService.Code.values();
+  private DiscountCode determineDiscountCode(String product) {
+    DiscountCode[] codes = DiscountCode.values();
     return codes[Math.abs((mName + product).hashCode()) % codes.length];
   }
 

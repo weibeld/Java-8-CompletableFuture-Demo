@@ -4,30 +4,29 @@ import java.util.concurrent.CompletableFuture;
 
 /* Server
  * API:
- *   static String                    applyDiscount      (Quote quote)
- *   static CompletableFuture<String> applyDiscountAsync (Quote quote) */
+ *   static ShopPrice applyDiscount      (Quote quote)
+ *   static CompletableFuture<ShopPrice> applyDiscountAsync (Quote quote) */
 public class DiscountService {
 
-
-  public enum Code {
+  public enum DiscountCode {
     NONE(0), SILVER(5), GOLD(10), PLATINUM(15), DIAMOND(20);
     private final int percentage;
-    Code(int percentage) {
+    DiscountCode(int percentage) {
       this.percentage = percentage;
     }
   }
 
-  public static String applyDiscount(Quote quote) {
+  public static ShopPrice applyDiscount(Quote quote) {
     double discountedPrice = apply(quote.getPrice(), quote.getDiscountCode());
     Util.randomDelay();
-    return String.format("%s: %.2f", quote.getShopName(), discountedPrice);
+    return new ShopPrice(quote.getShopName(), discountedPrice, quote.getCurrency());
   }
 
-  public static CompletableFuture<String> applyDiscountAsync(Quote quote) {
+  public static CompletableFuture<ShopPrice> applyDiscountAsync(Quote quote) {
     return CompletableFuture.supplyAsync(() -> applyDiscount(quote));
   }
 
-  private static double apply(double price, Code code) {
+  private static double apply(double price, DiscountCode code) {
     return price * (100-code.percentage) / 100;
   }
 

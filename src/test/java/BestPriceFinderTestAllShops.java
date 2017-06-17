@@ -19,11 +19,11 @@ public class BestPriceFinderTestAllShops {
   public void runFindAllPricesAsync() {
     say("> Calling findAllPricesAsync");
     long startTime = getTime();
-    Stream<CompletableFuture<String>> fut = mFinder.findAllPricesAsync(mProduct);
+    Stream<CompletableFuture<ShopPrice>> fut = mFinder.findAllPricesAsync(mProduct);
     say("< findAllPricesAsync returns after " + (getTime() - startTime) + " milliseconds");
 
-    CompletableFuture[] futArr = fut.map(f -> f.thenAccept(str ->
-      System.out.println(String.format("%s (%d milliseconds)", str, (getTime() - startTime)))
+    CompletableFuture[] futArr = fut.map(f -> f.thenAccept(price ->
+      System.out.println(String.format("%s (%d milliseconds)", price, (getTime() - startTime)))
       ))
       .toArray(size -> new CompletableFuture[size]);
     CompletableFuture.allOf(futArr).join();
