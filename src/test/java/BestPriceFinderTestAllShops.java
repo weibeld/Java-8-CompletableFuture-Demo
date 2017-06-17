@@ -40,7 +40,9 @@ public class BestPriceFinderTestAllShops {
     Stream<CompletableFuture<String>> fut = mFinder.findAllPricesAsync(mProduct);
     say("< findAllPricesAsync returns after " + (getTime() - startTime) + " milliseconds");
 
-    CompletableFuture[] futArr = fut.map(f -> f.thenAccept(System.out::println))
+    CompletableFuture[] futArr = fut.map(f -> f.thenAccept(str ->
+      System.out.println(String.format("%s (%d milliseconds)", str, (getTime() - startTime)))
+      ))
       .toArray(size -> new CompletableFuture[size]);
     CompletableFuture.allOf(futArr).join();
     say("All shops returned results after " + (getTime() - startTime) + " milliseconds");
