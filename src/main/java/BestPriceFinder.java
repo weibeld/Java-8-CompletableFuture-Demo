@@ -6,20 +6,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static org.weibeld.bestprice.DiscountService.applyDiscount;
 
-/* Client
- * API:
- *   String         findPrice             (String shop, String product)
- *   Future<String> findPriceAsync        (String shop, String product) 
- *   List<String>   findAllPrices         (String product)
- *   List<String>   findAllPricesParallel (String product)
- *   List<String>   findAllPricesAsync    (String product) */
+/* Client */
 public class BestPriceFinder {
 
   private final List<Shop> mShops = Arrays.asList(new Shop("BestShop"),
@@ -44,23 +36,6 @@ public class BestPriceFinder {
     return (new Shop(shop)).getPriceAsync(product)
       .thenApply(Quote::parse)
       .thenCompose(DiscountService::applyDiscountAsync);
-  }
-
-  public List<String> findAllPrices(String product) {
-    return mShops.stream()
-      .map(shop -> shop.getPrice(product))  // blocking...
-      .map(Quote::parse)
-      .map(DiscountService::applyDiscount)  // blocking...
-      .collect(Collectors.toList());
-  }
-
-  public List<String> findAllPricesParallel(String product) {
-    // Note that this stream is not guaranteed to be parallel
-    return mShops.parallelStream()
-      .map(shop -> shop.getPrice(product))  // blocking...
-      .map(Quote::parse)
-      .map(DiscountService::applyDiscount)  // blocking...
-      .collect(Collectors.toList());
   }
 
   // This solution uses a synchronous API in an asynchronous (non-blocking) way
