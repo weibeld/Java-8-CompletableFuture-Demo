@@ -7,7 +7,7 @@ public class ExchangeService {
   }
 
   public static double getUsdEur() {
-    Util.delay(500L);
+    Util.delay(2000L);
     return 0.8937;
   }
 

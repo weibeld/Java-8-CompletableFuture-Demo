@@ -25,7 +25,7 @@ public class Shop {
     double price = determinePrice(product);
     DiscountCode discountCode = determineDiscountCode(product);
     Currency currency = Currency.valueOf("USD");
-    Util.randomDelay();
+    Util.delay(2000L);
     return String.format("%s:%.2f:%s:%s", mName, price, discountCode, currency);
   }
 

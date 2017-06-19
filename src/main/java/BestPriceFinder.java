@@ -48,18 +48,16 @@ public class BestPriceFinder {
 
   // This solution uses a synchronous API in an asynchronous (non-blocking) way
   public Stream<CompletableFuture<ShopPrice>> findAllPricesAsync(String product) {
+    CompletableFuture<Double> rate = supplyAsync(ExchangeService::getUsdEur);
     return mShops.stream()
       .map(shop -> supplyAsync(() -> shop.getPrice(product), mExec))
       .map(f -> f.thenApply(Quote::parse))
       .map(f -> f.thenCompose(
         quote -> supplyAsync(() -> DiscountService.applyDiscount(quote), mExec)))
-      .map(f -> f.thenCombine(
-        supplyAsync(ExchangeService::getUsdEur, mExec),
-        (price, rate) -> {
-          price.convertCurrency(rate, Currency.EUR);
-          return price;
-        }
-      ));
+      .map(f -> f.thenApply(price -> {
+        price.convertCurrency(rate.join(), Currency.EUR);
+        return price;
+      }));
   }
 
 }

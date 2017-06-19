@@ -18,7 +18,7 @@ public class DiscountService {
 
   public static ShopPrice applyDiscount(Quote quote) {
     double discountedPrice = apply(quote.getPrice(), quote.getDiscountCode());
-    Util.randomDelay();
+    Util.delay(2000L);
     return new ShopPrice(quote.getShopName(), discountedPrice, quote.getCurrency());
   }
 
